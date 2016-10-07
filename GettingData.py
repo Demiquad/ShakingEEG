@@ -26,7 +26,7 @@ a = b
 b = a + 44
 a = b
 b = a + 8
-nDataRecords = int(data[a:b])
+nDataRecords = int(data[a:b]) # indicates how many records per signal
 a = b
 b = a + 8
 durationDataRecords = float(data[a:b])
@@ -42,7 +42,8 @@ digitalMinimum = []
 digitalMaximum = []
 prefiltering = []
 nSamples = []
-dataRecords = []*nSignals
+dataSignals = []
+dataRecords = []
 
 for i in range(nSignals):
   a = b
@@ -83,12 +84,10 @@ for i in range(nSignals):
 for i in range(nSignals):
   a = b
   b = a + 32
+
 for i in range(nSignals):
-  dataRecords.append([])
-  for j in range(nSamples[i]):
-    dataRecords[i].append(ord(data[b]))
+  for j in range(nSamples[i]*nDataRecords):
+    dataRecords.append(data[a])
     a = b
-    b = a + 1
-for i in range(1):
-  plt.plot(dataRecords[i])
-  plt.show()
+    b = a + 2
+  dataSignals.append(ord(dataRecords[i]))
