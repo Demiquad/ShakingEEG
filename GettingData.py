@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 
-f = open("chb02_01.edf", "r")
+f = open("chb02_01.edf", "r", errors="ignore")
 data = f.read()
 f.close()
 
+print('######## General Information #########################')
 a = 0
 b = a + 8
 version = data[a:b]
@@ -26,13 +27,14 @@ a = b
 b = a + 44
 a = b
 b = a + 8
-nDataRecords = int(data[a:b]) # indicates how many records per signal
+nDataRecords = int(data[a:b])
 a = b
 b = a + 8
 durationDataRecords = float(data[a:b])
 a = b
 b = a + 4
 nSignals = int(data[a:b])
+
 label = []
 transducer = []
 dimension = []
@@ -42,8 +44,7 @@ digitalMinimum = []
 digitalMaximum = []
 prefiltering = []
 nSamples = []
-dataSignals = []
-dataRecords = []
+
 
 for i in range(nSignals):
   a = b
@@ -81,13 +82,36 @@ for i in range(nSignals):
   a = b
   b = a + 8
   nSamples.append(int(data[a:b]))
-for i in range(nSignals):
+for i in range(nSignals+1):
   a = b
   b = a + 32
 
-for i in range(nSignals):
-  for j in range(nSamples[i]*nDataRecords):
-    dataRecords.append(data[a])
-    a = b
-    b = a + 2
-  dataSignals.append(ord(dataRecords[i]))
+print('There are', nSignals, 'signals recorded.')
+print('There are', nDataRecords, "numbers of Data Records")
+controlVariable = 1
+for i in range(len(nSamples)):
+  if nSamples[0] != nSamples[i]:
+    controlVariable = 0
+if controlVariable == 1:
+  print('Each Data Record\'s number of samples is', nSamples[0])
+else:
+    print('Each Data Record\'s number of samples is', nSamples)
+print('Each Data Record\'s duration is', durationDataRecords, 'seconds')
+print('Each signal has', nDataRecords/nSignals,'Data Records')
+print('####################################################')
+    
+dataSignals = []
+dataRecords = []
+'''
+for i in range(nDataRecords):
+  for j in range(nSignals):
+    for k in range(nSamples[j])
+      dataRecords.append(data[k])
+'''
+
+#                 nDataRecords ------> i
+#  nSignals     [ nSamples k ]
+#  |
+#  |
+#  v
+#  j
