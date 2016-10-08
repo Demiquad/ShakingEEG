@@ -1,25 +1,30 @@
-import matplotlib.pyplot as plt
+import sys
+import time
+#import matplotlib.pyplot as plt
 
-f = open("chb02_01.edf", "r", errors="ignore")
+start = time.time()
+
+f = open("chb02_01.edf", "rb")
 data = f.read()
 f.close()
 
 print('######## General Information #########################')
+sys.stdout.flush()
 a = 0
 b = a + 8
-version = data[a:b]
+version = data[a:b].decode('ascii')
 a = b
 b = a + 80
-patientId = data[a:b]
+patientId = data[a:b].decode('ascii')
 a = b
 b = a + 80
-recordingId = data[a:b]
+recordingId = data[a:b].decode('ascii')
 a = b
 b = a + 8
-startDate = data[a:b]
+startDate = data[a:b].decode('ascii')
 a = b
 b = a + 8
-startTime = data[a:b]
+startTime = data[a:b].decode('ascii')
 a = b
 b = a + 8
 numHeader = int(data[a:b])
@@ -49,40 +54,40 @@ nSamples = []
 for i in range(nSignals):
   a = b
   b = a + 16
-  label.append(data[a:b])
+  label.append(data[a:b].decode('ascii'))
 for i in range(nSignals):
   a = b
   b = a + 80
-  transducer.append(data[a:b])
+  transducer.append(data[a:b].decode('ascii'))
 for i in range(nSignals):
   a = b
   b = a + 8
-  dimension.append(data[a:b])
+  dimension.append(data[a:b].decode('ascii'))
 for i in range(nSignals):
   a = b
   b = a + 8
-  physMinimum.append(data[a:b])
+  physMinimum.append(int(data[a:b]))
 for i in range(nSignals):
   a = b
   b = a + 8
-  physMaximum.append(data[a:b])
+  physMaximum.append(int(data[a:b]))
 for i in range(nSignals):
   a = b
   b = a + 8
-  digitalMinimum.append(data[a:b])
+  digitalMinimum.append(int(data[a:b]))
 for i in range(nSignals):
   a = b
   b = a + 8
-  digitalMaximum.append(data[a:b])
+  digitalMaximum.append(int(data[a:b]))
 for i in range(nSignals):
   a = b
   b = a + 80
-  prefiltering.append(data[a:b])
+  prefiltering.append(data[a:b].decode('ascii'))
 for i in range(nSignals):
   a = b
   b = a + 8
   nSamples.append(int(data[a:b]))
-for i in range(nSignals+1):
+for i in range(nSignals):
   a = b
   b = a + 32
 
@@ -97,17 +102,26 @@ if controlVariable == 1:
 else:
     print('Each Data Record\'s number of samples is', nSamples)
 print('Each Data Record\'s duration is', durationDataRecords, 'seconds')
-print('Each signal has', nDataRecords/nSignals,'Data Records')
 print('####################################################')
+sys.stdout.flush()
     
-dataSignals = []
-dataRecords = []
-'''
+dataSignals = [[] for x in range(nSignals)]
+dataRecords = [[[] for x in range(nSignals)] for y in range(nDataRecords)]
+
+print("\r0 records read", end="")
+print("   |   0 seconds elapsed", end="")
+sys.stdout.flush()
 for i in range(nDataRecords):
   for j in range(nSignals):
-    for k in range(nSamples[j])
-      dataRecords.append(data[k])
-'''
+    for k in range(nSamples[j]):
+      a = b
+      b = a + 2
+      x = int.from_bytes(data[a:b], byteorder='little', signed=True)
+      dataRecords[i][j].append(x)
+      dataSignals[j].append(x)
+  print("\r{} records read".format(i+1), end="")
+  print("   |   {} seconds elapsed".format(int(time.time()-start)), end="")
+  sys.stdout.flush()
 
 #                 nDataRecords ------> i
 #  nSignals     [ nSamples k ]
